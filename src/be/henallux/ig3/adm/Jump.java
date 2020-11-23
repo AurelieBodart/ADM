@@ -45,13 +45,6 @@ public class Jump implements Comparable<Jump> {
 
     @Override
     public int compareTo(Jump o) {
-        if(getSaut() < o.getSaut())
-            return -1;
-        else {
-            if(getSaut() > o.getSaut())
-                return 1;
-            else
-                return 0;
-        }
+        return Integer.compare(getSaut(), o.getSaut());
     }
 }
