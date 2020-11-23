@@ -17,7 +17,11 @@ public class Main {
 
         jumpsTest.generatedTab();
         for(Jump j : jumpsTest.getJumpsList())
-            System.out.println(" [Saut = " + j.getSaut() + " ri = " + j.getRi() + " pi = " + j.getPi() + " npi = " + j.getNpi() + "]");
+            System.out.println(" [Saut = " + j.getSaut() +
+                    " ri = " + j.getRi() +
+                    " pi = " + j.getPi() +
+                    " npi = " + j.getNpi() +
+                    " (ri - npi)^2 / npi = " + j.getPartialX2Observable() + "]");
 
         // Etape 4 : regrouper les npi à partir du bas du tableau si < 5
         //           calculer khi carré observé

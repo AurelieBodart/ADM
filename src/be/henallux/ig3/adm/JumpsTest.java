@@ -85,25 +85,31 @@ public class JumpsTest {
             jumpsList.get(i).setPi(Math.pow(0.9, i) * 0.1);
         }
 
-
         // réduire nombre de lignes si plus grand que a
         int a = calculateA();
         System.out.println("a = " + a);
-
-        if (jumpsList.size() > a) {
-            for (int i = jumpsList.size() - 1; i >= a; i--){
-                int newRi = jumpsList.get(a).getRi() + jumpsList.get(i).getRi();
-                double newPi = jumpsList.get(a).getPi() + jumpsList.get(i).getPi();
-
-                jumpsList.get(a).setRi(newRi);
-                jumpsList.get(a).setPi(newPi);
-                jumpsList.remove(jumpsList.get(i));
-            }
-        }
+        if (jumpsList.size() > a)
+            sumWithA(a);
 
         // calculer npi
         int n = jumps.size();
         for(Jump jump : jumpsList)
             jump.setNpi(jump.getPi() * n);
+
+        // calcule ((ri-n*pi)^2)/(n*pi)
+        for(Jump jump : jumpsList){
+            jump.setPartialX2Observable(Math.pow(jump.getRi()-jump.getNpi(), 2) / jump.getNpi());
+        }
+    }
+
+    private void sumWithA(int a){
+        for (int i = jumpsList.size() - 1; i >= a; i--){
+            int newRi = jumpsList.get(a).getRi() + jumpsList.get(i).getRi();
+            double newPi = jumpsList.get(a).getPi() + jumpsList.get(i).getPi();
+
+            jumpsList.get(a).setRi(newRi);
+            jumpsList.get(a).setPi(newPi);
+            jumpsList.remove(jumpsList.get(i));
+        }
     }
 }

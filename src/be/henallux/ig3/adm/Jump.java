@@ -5,6 +5,7 @@ public class Jump implements Comparable<Jump> {
     private int ri;
     private double pi;
     private double npi;
+    private double partialX2Observable;
 
     public Jump(int saut, int ri) {
         this.saut = saut;
@@ -41,6 +42,14 @@ public class Jump implements Comparable<Jump> {
 
     public void setNpi(double npi) {
         this.npi = npi;
+    }
+
+    public double getPartialX2Observable() {
+        return partialX2Observable;
+    }
+
+    public void setPartialX2Observable(double partialX2Observable) {
+        this.partialX2Observable = partialX2Observable;
     }
 
     @Override
