@@ -9,6 +9,7 @@ public class JumpsTest {
     private double alpha;
     private int valueNbr;
     private ArrayList<Integer> jumps;
+    private ArrayList<Jump> jumpsList;
 
     public JumpsTest(String h0, String h1, double alpha, int valueNbr) {
         this.h0 = h0;
@@ -16,58 +17,21 @@ public class JumpsTest {
         this.alpha = alpha;
         this.valueNbr = valueNbr;
         jumps = new ArrayList<>();
+        jumpsList = new ArrayList<>();
     }
 
     public ArrayList<Integer> getJumps() {
         return jumps;
     }
+    public ArrayList<Jump> getJumpsList() { return jumpsList; }
 
-    public HashMap<Integer, List<Double>> generatedTab() {
-        HashMap<Integer, List<Double>> hashMap = new HashMap<>();
-        HashMap<Integer, Double> temp = new HashMap<>();
-
-        for (int jump : jumps) {
-            if (temp.containsKey(jump)) {
-                double nbrOccurrences = temp.get(jump);
-
-                temp.remove(jump);
-                temp.put(jump, nbrOccurrences + 1);
-            } else {
-                temp.put(jump, 1.);
-            }
-        }
-
-        int i = 0;
-        ArrayList<Integer> integersList = new ArrayList<>(temp.keySet());
-        // integersList.get(integersList.size() - 1);
-        for (Map.Entry<Integer, Double> entry : temp.entrySet()) {
-            ArrayList<Double> list = new ArrayList<>();
-
-            list.add(i == entry.getKey() ? entry.getValue() : 0.);
-            hashMap.put(i, list);
-            i++;
-        }
-
-        i = 0;
-
-        for (Map.Entry<Integer, List<Double>> integerListEntry : hashMap.entrySet()) {
-            integerListEntry.getValue().add(Math.pow(0.9, i) * 0.1);
-            i++;
-        }
-
-        int a = calculateA();
-        if (hashMap.size() > a) {
-            // for (i = hashMap.size() - 1; i > )
-        }
-
-        return hashMap;
-    }
 
     public void countJumps(ArrayList<Integer> suite) {
         int jumpCount = 0;
         int i = 0;
 
-        while (i < suite.size() && suite.get(i) != valueNbr) i++;
+        while (i < suite.size() && suite.get(i) != valueNbr)
+            i++;
 
         for (int iSuite = i + 1; iSuite < suite.size(); iSuite++) {
             if (suite.get(iSuite) == valueNbr) {
@@ -77,7 +41,69 @@ public class JumpsTest {
         }
     }
 
-    public int calculateA() {
+    private void countRi(){
+        for (int jump : jumps) {
+
+            int i = 0;
+            while (i < jumpsList.size() && jumpsList.get(i).getSaut() != jump)
+                i++;
+
+            if (i == jumpsList.size()) {
+                jumpsList.add(new Jump(jump, 1));
+            } else {
+                jumpsList.get(i).setRi(jumpsList.get(i).getRi() + 1);
+            }
+        }
+    }
+
+    private void fillGaps(){
+        int maxSizeSaut = jumpsList.get(jumpsList.size() - 1).getSaut();
+        for(int i = 0; i < maxSizeSaut; i++){
+            int j = 0;
+            while (j < jumpsList.size() && jumpsList.get(j).getSaut() != i)
+                j++;
+
+            if(j == jumpsList.size())
+                jumpsList.add(new Jump(i, 0));
+        }
+    }
+
+    private int calculateA() {
         return (int) Math.round(Math.log(5. / jumps.size()) / Math.log(0.9));
+    }
+
+
+    public void generatedTab() {
+        countRi();
+        Collections.sort(jumpsList);
+
+        fillGaps();
+        Collections.sort(jumpsList);
+
+        // calculer pi
+        for (int i = 0; i < jumpsList.size(); i++) {
+            jumpsList.get(i).setPi(Math.pow(0.9, i) * 0.1);
+        }
+
+
+        // réduire nombre de lignes si plus grand que a
+        int a = calculateA();
+        System.out.println("a = " + a);
+
+        if (jumpsList.size() > a) {
+            for (int i = jumpsList.size() - 1; i >= a; i--){
+                int newRi = jumpsList.get(a).getRi() + jumpsList.get(i).getRi();
+                double newPi = jumpsList.get(a).getPi() + jumpsList.get(i).getPi();
+
+                jumpsList.get(a).setRi(newRi);
+                jumpsList.get(a).setPi(newPi);
+                jumpsList.remove(jumpsList.get(i));
+            }
+        }
+
+        // calculer npi
+        int n = jumps.size();
+        for(Jump jump : jumpsList)
+            jump.setNpi(jump.getPi() * n);
     }
 }

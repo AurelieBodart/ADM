@@ -11,13 +11,20 @@ public class Main {
         ArrayList<Integer> suite = askForSuiteData(keyboard);
         JumpsTest jumpsTest = askForJumpsTestData(keyboard);
 
-        System.out.println(suite);
+        System.out.println("Suite : " + suite);
         jumpsTest.countJumps(suite);
-        System.out.println(jumpsTest.getJumps());
-        System.out.println(jumpsTest.generatedTab());
-        for (Entry<Integer, List<Double>> entry : jumpsTest.generatedTab().entrySet()) {
+        System.out.println("Sauts : " + jumpsTest.getJumps());
 
-        }
+        jumpsTest.generatedTab();
+        for(Jump j : jumpsTest.getJumpsList())
+            System.out.println(" [Saut = " + j.getSaut() + " ri = " + j.getRi() + " pi = " + j.getPi() + " npi = " + j.getNpi() + "]");
+
+        // Etape 4 : regrouper les npi à partir du bas du tableau si < 5
+        //           calculer khi carré observé
+
+        // Etape 5 : clavier pour khi carré théorique
+
+        // rejeter h0 ou non en comparant khi carré théorique et observé
 
     }
 
@@ -43,7 +50,7 @@ public class Main {
             isSuiteGood = suite.isHullDobellProof();
 
             if (!isSuiteGood)
-                System.out.println("Erreur : la suite ne respecte pas les crtières de Hull-Dobbel.\nChoisissez d'autres valeurs !");
+                System.out.println("Erreur : la suite ne respecte pas les critères de Hull-Dobell.\nChoisissez d'autres valeurs !");
         } while (!isSuiteGood);
 
         // TODO: console clear
