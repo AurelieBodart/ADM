@@ -103,12 +103,13 @@ public class JumpsTest {
     }
 
     private void sumWithA(int a){
+        int iA = a - 1;
         for (int i = jumpsList.size() - 1; i >= a; i--){
-            int newRi = jumpsList.get(a).getRi() + jumpsList.get(i).getRi();
-            double newPi = jumpsList.get(a).getPi() + jumpsList.get(i).getPi();
+            int newRi = jumpsList.get(iA).getRi() + jumpsList.get(i).getRi();
+            double newPi = jumpsList.get(iA).getPi() + jumpsList.get(i).getPi();
 
-            jumpsList.get(a).setRi(newRi);
-            jumpsList.get(a).setPi(newPi);
+            jumpsList.get(iA).setRi(newRi);
+            jumpsList.get(iA).setPi(newPi);
             jumpsList.remove(jumpsList.get(i));
         }
     }
