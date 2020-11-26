@@ -77,10 +77,6 @@ public class JumpsTest {
         for(Jump jump : jumpsList)
             jump.setNpi(jump.getPi() * n);
 
-        // calcule ((ri-n*pi)^2)/(n*pi)
-        for(Jump jump : jumpsList)
-            jump.setPartialX2Observable(Math.pow(jump.getRi()-jump.getNpi(), 2) / jump.getNpi());
-
     }
 
     private void countRi(){
@@ -127,8 +123,6 @@ public class JumpsTest {
     }
 
     public void reduceTab(){
-        int initialSize = jumpsList.size();
-
         for(int i = jumpsList.size()- 1; i > 0; i--){
             if(jumpsList.get(i).getNpi() < 5) {
                 double newNPi = jumpsList.get(i).getNpi() + jumpsList.get(i - 1).getNpi();
@@ -137,11 +131,12 @@ public class JumpsTest {
             }
         }
 
-        if(jumpsList.size() != initialSize) {
-            // on a réduit le tableau donc il faut recalculer ((ri-n*pi)^2)/(n*pi)
-            for(Jump jump : jumpsList)
-                jump.setPartialX2Observable(Math.pow(jump.getRi()-jump.getNpi(), 2) / jump.getNpi());
-        }
+        // calculer ((ri-n*pi)^2)/(n*pi)
+        // peut être l'ajouter directement à une variable chi carré observable static
+        // comme ça pas besoin de calculChiCarreObservable()
+        for(Jump jump : jumpsList)
+            jump.setPartialX2Observable(Math.pow(jump.getRi()-jump.getNpi(), 2) / jump.getNpi());
+
     }
 
     public Double calculChiCarreObservable() {
