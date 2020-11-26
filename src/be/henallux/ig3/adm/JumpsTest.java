@@ -1,8 +1,6 @@
 package be.henallux.ig3.adm;
 
 import java.util.*;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 public class JumpsTest {
     private String h0, h1;
@@ -25,6 +23,21 @@ public class JumpsTest {
     }
     public ArrayList<Jump> getJumpsList() { return jumpsList; }
 
+    public Integer getV(){
+        return jumpsList.size() - 1;
+    }
+
+    public Double getAlpha() {
+        return alpha;
+    }
+
+    public String getH0() {
+        return h0;
+    }
+
+    public String getH1() {
+        return h1;
+    }
 
     public void countJumps(ArrayList<Integer> suite) {
         int jumpCount = 0;
@@ -39,6 +52,35 @@ public class JumpsTest {
                 jumpCount = 0;
             } else jumpCount++;
         }
+    }
+
+    public void generatedTab() {
+        countRi();
+        Collections.sort(jumpsList);
+
+        fillGaps();
+        Collections.sort(jumpsList);
+
+        // calculer pi
+        for (int i = 0; i < jumpsList.size(); i++) {
+            jumpsList.get(i).setPi(Math.pow(0.9, i) * 0.1);
+        }
+
+        // réduire nombre de lignes si plus grand que a
+        int a = calculateA();
+        System.out.println("a = " + a);
+        if (jumpsList.size() > a)
+            sumWithA(a);
+
+        // calculer npi
+        int n = jumps.size();
+        for(Jump jump : jumpsList)
+            jump.setNpi(jump.getPi() * n);
+
+        // calcule ((ri-n*pi)^2)/(n*pi)
+        for(Jump jump : jumpsList)
+            jump.setPartialX2Observable(Math.pow(jump.getRi()-jump.getNpi(), 2) / jump.getNpi());
+
     }
 
     private void countRi(){
@@ -72,36 +114,6 @@ public class JumpsTest {
         return (int) Math.round(Math.log(5. / jumps.size()) / Math.log(0.9));
     }
 
-
-    public void generatedTab() {
-        countRi();
-        Collections.sort(jumpsList);
-
-        fillGaps();
-        Collections.sort(jumpsList);
-
-        // calculer pi
-        for (int i = 0; i < jumpsList.size(); i++) {
-            jumpsList.get(i).setPi(Math.pow(0.9, i) * 0.1);
-        }
-
-        // réduire nombre de lignes si plus grand que a
-        int a = calculateA();
-        System.out.println("a = " + a);
-        if (jumpsList.size() > a)
-            sumWithA(a);
-
-        // calculer npi
-        int n = jumps.size();
-        for(Jump jump : jumpsList)
-            jump.setNpi(jump.getPi() * n);
-
-        // calcule ((ri-n*pi)^2)/(n*pi)
-        for(Jump jump : jumpsList){
-            jump.setPartialX2Observable(Math.pow(jump.getRi()-jump.getNpi(), 2) / jump.getNpi());
-        }
-    }
-
     private void sumWithA(int a){
         int iA = a - 1;
         for (int i = jumpsList.size() - 1; i >= a; i--){
@@ -112,5 +124,32 @@ public class JumpsTest {
             jumpsList.get(iA).setPi(newPi);
             jumpsList.remove(jumpsList.get(i));
         }
+    }
+
+    public void reduceTab(){
+        int initialSize = jumpsList.size();
+
+        for(int i = jumpsList.size()- 1; i > 0; i--){
+            if(jumpsList.get(i).getNpi() < 5) {
+                double newNPi = jumpsList.get(i).getNpi() + jumpsList.get(i - 1).getNpi();
+                jumpsList.get(i - 1).setNpi(newNPi);
+                jumpsList.remove(jumpsList.get(i));
+            }
+        }
+
+        if(jumpsList.size() != initialSize) {
+            // on a réduit le tableau donc il faut recalculer ((ri-n*pi)^2)/(n*pi)
+            for(Jump jump : jumpsList)
+                jump.setPartialX2Observable(Math.pow(jump.getRi()-jump.getNpi(), 2) / jump.getNpi());
+        }
+    }
+
+    public Double calculChiCarreObservable() {
+        Double chiCarreObservable = 0.;
+
+        for(Jump jump : jumpsList)
+            chiCarreObservable += jump.getPartialX2Observable();
+
+        return chiCarreObservable;
     }
 }

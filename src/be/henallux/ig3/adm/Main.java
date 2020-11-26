@@ -8,6 +8,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner keyboard = new Scanner(System.in);
+
         ArrayList<Integer> suite = askForSuiteData(keyboard);
         JumpsTest jumpsTest = askForJumpsTestData(keyboard);
 
@@ -23,13 +24,52 @@ public class Main {
                     " npi = " + j.getNpi() +
                     " (ri - npi)^2 / npi = " + j.getPartialX2Observable() + "]");
 
+
+
+
         // Etape 4 : regrouper les npi à partir du bas du tableau si < 5
         //           calculer khi carré observé
 
+        System.out.println("Etape 4 - npi < 5 ?");
+        jumpsTest.reduceTab();
+        for(Jump j : jumpsTest.getJumpsList())
+            System.out.println(" [Saut = " + j.getSaut() +
+                    " ri = " + j.getRi() +
+                    " pi = " + j.getPi() +
+                    " npi = " + j.getNpi() +
+                    " (ri - npi)^2 / npi = " + j.getPartialX2Observable() + "]");
+
+        Double chiCarreObservable = jumpsTest.calculChiCarreObservable();
+
+
+
+
         // Etape 5 : clavier pour khi carré théorique
 
-        // rejeter h0 ou non en comparant khi carré théorique et observé
+        System.out.println("Etape 5 - établissement de la zone de non rejet");
+        System.out.println("Quel est votre chi carré théorique ? " +
+                "(nombre de degré de liberté (v) = " + jumpsTest.getV() +
+                " et alpha = " + jumpsTest.getAlpha());
+        Double chiCarreTheorique =  keyboard.nextDouble();
 
+
+
+
+
+        // Etape 6 - rejeter h0 ou non en comparant khi carré théorique et observé
+
+        System.out.println("Etape 6 - Rejet ou non de H0");
+        System.out.println("Rappel :" +
+                "\nH0 = " + jumpsTest.getH0() +
+                "\nH1 = " + jumpsTest.getH1());
+
+        System.out.println("Chi carré théorique = " + chiCarreTheorique);
+        System.out.println("Chi carré observable = " + chiCarreObservable);
+
+        if(chiCarreObservable > chiCarreTheorique)
+            System.out.println("H0 est rejeté");
+        else
+            System.out.println("H0 est n'est pas rejeté avec un degré d'incertitude de " + jumpsTest.getAlpha());
     }
 
     public static ArrayList<Integer> askForSuiteData(Scanner keyboard) {
