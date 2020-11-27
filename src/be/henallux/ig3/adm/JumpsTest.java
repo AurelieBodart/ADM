@@ -132,8 +132,6 @@ public class JumpsTest {
         }
 
         // calculer ((ri-n*pi)^2)/(n*pi)
-        // peut être l'ajouter directement à une variable chi carré observable static
-        // comme ça pas besoin de calculChiCarreObservable()
         for(Jump jump : jumpsList)
             jump.setPartialX2Observable(Math.pow(jump.getRi()-jump.getNpi(), 2) / jump.getNpi());
 

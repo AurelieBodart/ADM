@@ -1,28 +1,28 @@
 package be.henallux.ig3.adm;
 
+import org.apache.commons.math3.distribution.ChiSquaredDistribution;
+
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.*;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+
         Scanner keyboard = new Scanner(System.in);
 
         ArrayList<Integer> suite = askForSuiteData(keyboard);
         JumpsTest jumpsTest = askForJumpsTestData(keyboard);
 
-        System.out.println("Suite : " + suite);
+        System.out.println("Suite size : " + suite.size());
         jumpsTest.countJumps(suite);
-        System.out.println("Sauts : " + jumpsTest.getJumps());
+        System.out.println("Sauts size : " + jumpsTest.getJumps().size());
 
         jumpsTest.generatedTab();
         for(Jump j : jumpsTest.getJumpsList())
             System.out.println(" [Saut = " + j.getSaut() +
                     " ri = " + j.getRi() +
                     " pi = " + j.getPi() +
-                    " npi = " + j.getNpi() +
-                    " (ri - npi)^2 / npi = " + j.getPartialX2Observable() + "]");
+                    " npi = " + j.getNpi());
 
 
 
@@ -39,7 +39,7 @@ public class Main {
                     " npi = " + j.getNpi() +
                     " (ri - npi)^2 / npi = " + j.getPartialX2Observable() + "]");
 
-        Double chiCarreObservable = jumpsTest.calculChiCarreObservable();
+
 
 
 
@@ -47,14 +47,14 @@ public class Main {
         // Etape 5 : clavier pour khi carré théorique
 
         System.out.println("Etape 5 - établissement de la zone de non rejet");
-        System.out.println("Quel est votre chi carré théorique ? " +
-                "(nombre de degré de liberté (v) = " + jumpsTest.getV() +
-                " et alpha = " + jumpsTest.getAlpha());
-        Double chiCarreTheorique =  keyboard.nextDouble();
 
+        Double chiCarreObservable = jumpsTest.calculChiCarreObservable();
 
+        ChiSquaredDistribution x2 = new ChiSquaredDistribution( jumpsTest.getV() );
+        double chiCarreTheorique = x2.inverseCumulativeProbability(jumpsTest.getAlpha());
 
-
+        System.out.println("Chi carré observable = " + chiCarreObservable);
+        System.out.println("Chi carré théorique = " + chiCarreTheorique);
 
         // Etape 6 - rejeter h0 ou non en comparant khi carré théorique et observé
 
@@ -62,9 +62,6 @@ public class Main {
         System.out.println("Rappel :" +
                 "\nH0 = " + jumpsTest.getH0() +
                 "\nH1 = " + jumpsTest.getH1());
-
-        System.out.println("Chi carré théorique = " + chiCarreTheorique);
-        System.out.println("Chi carré observable = " + chiCarreObservable);
 
         if(chiCarreObservable > chiCarreTheorique)
             System.out.println("H0 est rejeté");
@@ -110,10 +107,14 @@ public class Main {
         System.out.println("-----------------------------------------------");
         System.out.println("Test des sauts");
         System.out.println("Etape 1 - hypothèses");
+
+        keyboard.nextLine();
+
         System.out.println("Quelle est votre hypothèse h0 ?");
-        h0 = keyboard.next();
+        h0 = keyboard.nextLine();
+
         System.out.println("Quelle est votre hypothèse h1 ?");
-        h1 = keyboard.next();
+        h1 = keyboard.nextLine();
 
         System.out.println("\nEtape 2 - niveau d'incertitude / alpha");
         System.out.println("Quelle est votre alpha ?");

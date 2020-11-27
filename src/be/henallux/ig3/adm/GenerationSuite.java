@@ -31,8 +31,8 @@ public class GenerationSuite {
                 .allMatch(prime -> (a - 1) % prime == 0);
     }
 
-    private static ArrayList<Integer> primesRecursive(int n, int f) {
-        if (n == 1) return new ArrayList<>();
+    public static ArrayList<Integer> primesRecursive(int n, int f) {
+        if (n <= 1) return new ArrayList<>();
 
         if (n % f == 0) {
             ArrayList<Integer> factors = primesRecursive(n/f, f);
