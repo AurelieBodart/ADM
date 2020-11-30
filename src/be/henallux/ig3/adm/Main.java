@@ -2,71 +2,74 @@ package be.henallux.ig3.adm;
 
 import org.apache.commons.math3.distribution.ChiSquaredDistribution;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        try {
+            Scanner keyboard = new Scanner(System.in);
+            FileOutputStream resultStream = new FileOutputStream("Résultats.txt");
+            OutputRedirection redirection = new OutputRedirection(System.out, resultStream);
+            PrintStream out = new PrintStream(redirection);
 
-        Scanner keyboard = new Scanner(System.in);
+            System.setOut(out);
 
-        ArrayList<Integer> suite = askForSuiteData(keyboard);
-        JumpsTest jumpsTest = askForJumpsTestData(keyboard);
+            ArrayList<Integer> suite = askForSuiteData(keyboard);
+            JumpsTest jumpsTest = askForJumpsTestData(keyboard);
 
-        System.out.println("Suite size : " + suite.size());
-        jumpsTest.countJumps(suite);
-        System.out.println("Sauts size : " + jumpsTest.getJumps().size());
+            System.out.println("Suite size : " + suite.size());
+            jumpsTest.countJumps(suite);
+            System.out.println("Sauts size : " + jumpsTest.getJumps().size());
 
-        jumpsTest.generatedTab();
-        for(Jump j : jumpsTest.getJumpsList())
-            System.out.println(" [Saut = " + j.getSaut() +
-                    " ri = " + j.getRi() +
-                    " pi = " + j.getPi() +
-                    " npi = " + j.getNpi());
-
-
-
-
-        // Etape 4 : regrouper les npi à partir du bas du tableau si < 5
-        //           calculer khi carré observé
-
-        System.out.println("Etape 4 - npi < 5 ?");
-        jumpsTest.reduceTab();
-        for(Jump j : jumpsTest.getJumpsList())
-            System.out.println(" [Saut = " + j.getSaut() +
-                    " ri = " + j.getRi() +
-                    " pi = " + j.getPi() +
-                    " npi = " + j.getNpi() +
-                    " (ri - npi)^2 / npi = " + j.getPartialX2Observable() + "]");
+            jumpsTest.generatedTab();
+            for (Jump j : jumpsTest.getJumpsList())
+                System.out.println(" [Saut = " + j.getSaut() +
+                        " ri = " + j.getRi() +
+                        " pi = " + j.getPi() +
+                        " npi = " + j.getNpi());
 
 
+            // Etape 4 : regrouper les npi à partir du bas du tableau si < 5
+            //           calculer khi carré observé
+
+            System.out.println("Etape 4 - npi < 5 ?");
+            jumpsTest.reduceTab();
+            for (Jump j : jumpsTest.getJumpsList())
+                System.out.println(" [Saut = " + j.getSaut() +
+                        " ri = " + j.getRi() +
+                        " pi = " + j.getPi() +
+                        " npi = " + j.getNpi() +
+                        " (ri - npi)^2 / npi = " + j.getPartialX2Observable() + "]");
 
 
+            // Etape 5 : clavier pour khi carré théorique
 
+            System.out.println("Etape 5 - établissement de la zone de non rejet");
 
-        // Etape 5 : clavier pour khi carré théorique
+            Double chiCarreObservable = jumpsTest.calculChiCarreObservable();
 
-        System.out.println("Etape 5 - établissement de la zone de non rejet");
+            ChiSquaredDistribution x2 = new ChiSquaredDistribution(jumpsTest.getV());
+            double chiCarreTheorique = x2.inverseCumulativeProbability(jumpsTest.getAlpha());
 
-        Double chiCarreObservable = jumpsTest.calculChiCarreObservable();
+            System.out.println("Chi carré observable = " + chiCarreObservable);
+            System.out.println("Chi carré théorique = " + chiCarreTheorique);
 
-        ChiSquaredDistribution x2 = new ChiSquaredDistribution( jumpsTest.getV() );
-        double chiCarreTheorique = x2.inverseCumulativeProbability(jumpsTest.getAlpha());
+            // Etape 6 - rejeter h0 ou non en comparant khi carré théorique et observé
 
-        System.out.println("Chi carré observable = " + chiCarreObservable);
-        System.out.println("Chi carré théorique = " + chiCarreTheorique);
+            System.out.println("Etape 6 - Rejet ou non de H0");
+            System.out.println("Rappel :" +
+                    "\nH0 = " + jumpsTest.getH0() +
+                    "\nH1 = " + jumpsTest.getH1());
 
-        // Etape 6 - rejeter h0 ou non en comparant khi carré théorique et observé
-
-        System.out.println("Etape 6 - Rejet ou non de H0");
-        System.out.println("Rappel :" +
-                "\nH0 = " + jumpsTest.getH0() +
-                "\nH1 = " + jumpsTest.getH1());
-
-        if(chiCarreObservable > chiCarreTheorique)
-            System.out.println("H0 est rejeté");
-        else
-            System.out.println("H0 est n'est pas rejeté avec un degré d'incertitude de " + jumpsTest.getAlpha());
+            if (chiCarreObservable > chiCarreTheorique)
+                System.out.println("H0 est rejeté");
+            else
+                System.out.println("H0 est n'est pas rejeté avec un degré d'incertitude de " + jumpsTest.getAlpha());
+        } catch (FileNotFoundException ignored) {}
     }
 
     public static ArrayList<Integer> askForSuiteData(Scanner keyboard) {
@@ -87,14 +90,14 @@ public class Main {
             System.out.print("Quel est votre x0 ? ");
             x0 = keyboard.nextInt();
 
+            System.out.println("\nVous avez choisi { a = " + a + " ; c = " + c + " ; m = " + m + " ; x0 = " + x0 + " }.");
+
             suite = new GenerationSuite(x0, c, a, m);
             isSuiteGood = suite.isHullDobellProof();
 
             if (!isSuiteGood)
                 System.out.println("Erreur : la suite ne respecte pas les critères de Hull-Dobell.\nChoisissez d'autres valeurs !");
         } while (!isSuiteGood);
-
-        // TODO: console clear
 
         return suite.generateYnList(suite.generateUnList(suite.generateXnList()));
     }
@@ -116,10 +119,13 @@ public class Main {
         System.out.println("Quelle est votre hypothèse h1 ?");
         h1 = keyboard.nextLine();
 
+        System.out.println("\nVous avez choisi `" + h0 + "` comme h0 et `" + h1 + "` comme h1.");
+
         System.out.println("\nEtape 2 - niveau d'incertitude / alpha");
         System.out.println("Quelle est votre alpha ?");
         alpha = keyboard.nextDouble();
 
+        System.out.println("\nCertitude à " + (100 - alpha * 10) + "%.");
         System.out.println("\nEtape 3 - Génération des tableaux de fréquence");
         do {
             System.out.println("Quelle valeur voulez-vous utiliser (entre 0 et 9) ?");
@@ -127,6 +133,8 @@ public class Main {
             if (valueNbr < 0 || valueNbr > 9)
                 System.out.println("Erreur : Vous devez choisir une valeur entre 0 et 9 !");
         } while (valueNbr < 0 || valueNbr > 9);
+
+        System.out.println("\nVous avez choisi " + valueNbr + " comme valeur à tester.");
 
         return new JumpsTest(h0, h1, alpha, valueNbr);
     }
