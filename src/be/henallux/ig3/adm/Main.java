@@ -9,6 +9,15 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
+    public static final int EXPRESS_CLIENT_COST = 35;
+    public static final int ORDINARY_CLIENT_COST = 25;
+    public static final int ABSOLUTE_CLIENT_COST = 45;
+    public static final int EXPRESS_STATION_OCCUPATION_COST = 32;
+    public static final int ORDINARY_STATION_OCCUPATION_COST = 30;
+    public static final int EMPTY_STATION_COST = 18;
+    public static final int QUEUE_CHANGING_COST = 15;
+    public static final int CLIENT_EJECTION_COST = 20;
+
     public static void main(String[] args) {
         try {
             Scanner keyboard = new Scanner(System.in);
@@ -90,8 +99,6 @@ public class Main {
             System.out.print("Quel est votre x0 ? ");
             x0 = keyboard.nextInt();
 
-            System.out.println("\nVous avez choisi { a = " + a + " ; c = " + c + " ; m = " + m + " ; x0 = " + x0 + " }.");
-
             suite = new GenerationSuite(x0, c, a, m);
             isSuiteGood = suite.isHullDobellProof();
 
@@ -119,13 +126,10 @@ public class Main {
         System.out.println("Quelle est votre hypothèse h1 ?");
         h1 = keyboard.nextLine();
 
-        System.out.println("\nVous avez choisi `" + h0 + "` comme h0 et `" + h1 + "` comme h1.");
-
         System.out.println("\nEtape 2 - niveau d'incertitude / alpha");
         System.out.println("Quelle est votre alpha ?");
         alpha = keyboard.nextDouble();
 
-        System.out.println("\nCertitude à " + (100 - alpha * 10) + "%.");
         System.out.println("\nEtape 3 - Génération des tableaux de fréquence");
         do {
             System.out.println("Quelle valeur voulez-vous utiliser (entre 0 et 9) ?");
@@ -134,8 +138,53 @@ public class Main {
                 System.out.println("Erreur : Vous devez choisir une valeur entre 0 et 9 !");
         } while (valueNbr < 0 || valueNbr > 9);
 
-        System.out.println("\nVous avez choisi " + valueNbr + " comme valeur à tester.");
-
         return new JumpsTest(h0, h1, alpha, valueNbr);
+    }
+
+    public static int simulation(int minimumStationsNumber, int maximumStationsNumber, int simulationTime) {
+        int stationsNumber = minimumStationsNumber;
+        int[] totalCosts = new int[maximumStationsNumber];
+
+        while (stationsNumber <= maximumStationsNumber) {
+            Client[] expressStations = new Client[2];
+            Client[] ordinaryStations = new Client[stationsNumber - 2];
+
+            Client[] expressQueue = new Client[10];
+            ArrayList<Client> ordinaryQueue = new ArrayList<>();
+            ArrayList<Client> vipQueue = new ArrayList<>();
+
+            int cumulatedExpressStationDuration = 0;
+            int cumulatedOrdinaryStationDuration = 0;
+            int cumulatedVIPStationDuration = 0;
+            int vacancyDuration = 0;
+
+            int totalClientEjectionCost = 0;
+            int totalChangingQueueCost = 0;
+
+            int time = 1;
+
+            while (time <= simulationTime) {
+                // Placement en file
+                int arrivalsNumber = generateArrivals();
+                ArrayList<Client> clients = initializeClientDurations(arrivalsNumber);
+
+                // Partie de Maxime
+
+                // Placement en station + décrémentation
+                // Partie de Christophe
+            }
+
+            stationsNumber++;
+        }
+
+        return totalCosts[0];
+    }
+
+    private int generateArrivals() {
+        // Maxime
+    }
+
+    private ArrayList<Client> initializeClientDurations(int arrivalsNumber) {
+        // Maxime
     }
 }
