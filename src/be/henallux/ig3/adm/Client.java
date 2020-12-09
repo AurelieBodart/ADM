@@ -25,11 +25,23 @@ public class Client {
         return serviceDuration;
     }
 
-    public void setServiceDuration(int serviceDuration) {
-        this.serviceDuration = serviceDuration;
+    public void decrementServiceDuration() {
+        this.serviceDuration--;
     }
 
     public int getSystemEntry() {
         return systemEntry;
+    }
+
+    public void setSystemEntry(int systemEntry) {
+        this.systemEntry = systemEntry;
+    }
+
+    public void setIsEjected(boolean ejected) {
+        this.ejected = ejected;
+    }
+
+    public boolean getIsEjected() {
+        return ejected;
     }
 }
