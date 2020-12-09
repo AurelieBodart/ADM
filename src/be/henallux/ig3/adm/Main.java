@@ -145,9 +145,14 @@ public class Main {
         int stationsNumber = minimumStationsNumber;
         int[] totalCosts = new int[maximumStationsNumber];
 
+        //Ajout de Max
+        int changingQueueCost = 15;
+
+
         while (stationsNumber <= maximumStationsNumber) {
             Client[] expressStations = new Client[2];
             Client[] ordinaryStations = new Client[stationsNumber - 2];
+
 
             Client[] expressQueue = new Client[10];
             ArrayList<Client> ordinaryQueue = new ArrayList<>();
@@ -161,14 +166,40 @@ public class Main {
             int totalClientEjectionCost = 0;
             int totalChangingQueueCost = 0;
 
+            //Ajout de Max
+            int iQueueExpress = 0;
             int time = 1;
+            GenerationSuite suite = new GenerationSuite(); //TODO: Rajouter x0, c, a, m
+
 
             while (time <= simulationTime) {
                 // Placement en file
                 int arrivalsNumber = generateArrivals();
                 ArrayList<Client> clients = initializeClientDurations(arrivalsNumber);
 
+
                 // Partie de Maxime
+                for (Client client : clients) {
+                    client.setSystemEntry(time);
+
+                    if (client.getServiceDuration() == 1) {
+                        if (iQueueExpress < 10) {
+                            client.setType("express");
+                            expressQueue[iQueueExpress] = client;
+                            iQueueExpress++;
+
+                        } else {
+                            client.setType("ordinaire");
+                            totalChangingQueueCost += changingQueueCost;
+                            ordinaryQueue.add(client);
+                        }
+                    } else {
+                        double un = suite.generateUn(suite.generateXn());
+
+                        if ()
+                    }
+                }
+
 
                 // Placement en station + décrémentation
                 // Partie de Christophe
@@ -180,11 +211,34 @@ public class Main {
         return totalCosts[0];
     }
 
-    private int generateArrivals() {
-        // Maxime
+    private static int generateArrivals() {
+        GenerationSuite suite = new GenerationSuite(); //TODO: Rajouter x0, c, a, m
+        double un = suite.generateUn(suite.generateXn());
+
+        int x = (un < 0.1353) ? 0 : (un < 0.4060) ? 1 : (un < 0.6767) ? 2 : (un < 0.8571) ? 3 :
+                (un < 0.9473) ? 4 : (un < 0.9834) ? 5 : (un < 0.9955) ? 6 : (un < 0.9989) ? 7 : (un < 0.9998) ? 8 : 9;
+
+        return x;
     }
 
-    private ArrayList<Client> initializeClientDurations(int arrivalsNumber) {
-        // Maxime
+    private static ArrayList<Client> initializeClientDurations(int arrivalsNumber) {
+
+        GenerationSuite suite = new GenerationSuite(); //TODO: Rajouter x0, c, a, m
+
+        ArrayList<Client> clients = new ArrayList<>();
+        int iArrival = 0;
+
+        while (iArrival < arrivalsNumber) {
+
+            double un = suite.generateUn(suite.generateXn());
+
+            int x = (un < 0.4) ? 1 : (un < 0.7) ? 2 : (un < 0.8667) ? 3 : (un < 0.9167) ? 4 : (un < 0.9667) ? 5 : 6;
+
+            clients.add(new Client(null, x,0,false)); // ?? je met quoi dans les autre variable
+
+            iArrival++;
+        }
+
+        return clients;
     }
 }
