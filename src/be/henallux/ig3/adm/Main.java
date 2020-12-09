@@ -145,7 +145,7 @@ public class Main {
         int stationsNumber = minimumStationsNumber;
         int[] totalCosts = new int[maximumStationsNumber];
 
-        //Ajout de Max
+        //Ajout de Max //TODO: A vérifier
         int changingQueueCost = 15;
 
 
@@ -166,7 +166,7 @@ public class Main {
             int totalClientEjectionCost = 0;
             int totalChangingQueueCost = 0;
 
-            //Ajout de Max
+            //Ajout de Max //TODO: A vérifier
             int iQueueExpress = 0;
             int time = 1;
             GenerationSuite suite = new GenerationSuite(); //TODO: Rajouter x0, c, a, m
@@ -178,7 +178,7 @@ public class Main {
                 ArrayList<Client> clients = initializeClientDurations(arrivalsNumber);
 
 
-                // Partie de Maxime
+                // Partie de Maxime //TODO: A vérifier
                 for (Client client : clients) {
                     client.setSystemEntry(time);
 
@@ -187,7 +187,6 @@ public class Main {
                             client.setType("express");
                             expressQueue[iQueueExpress] = client;
                             iQueueExpress++;
-
                         } else {
                             client.setType("ordinaire");
                             totalChangingQueueCost += changingQueueCost;
@@ -196,7 +195,13 @@ public class Main {
                     } else {
                         double un = suite.generateUn(suite.generateXn());
 
-                        if ()
+                        if (un < 0.10) {
+                            client.setType("prioritaire abslolut");
+                            vipQueue.add(client);
+                        } else {
+                            client.setType("ordinaire");
+                            ordinaryQueue.add(client);
+                        }
                     }
                 }
 
@@ -234,7 +239,7 @@ public class Main {
 
             int x = (un < 0.4) ? 1 : (un < 0.7) ? 2 : (un < 0.8667) ? 3 : (un < 0.9167) ? 4 : (un < 0.9667) ? 5 : 6;
 
-            clients.add(new Client(null, x,0,false)); // ?? je met quoi dans les autre variable
+            clients.add(new Client(null, x,0,false)); // ?? je met quoi dans les autre variable ? //TODO: A vérifier
 
             iArrival++;
         }
