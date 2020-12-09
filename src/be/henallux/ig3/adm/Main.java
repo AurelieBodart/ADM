@@ -143,7 +143,7 @@ public class Main {
 
     public static int simulation(int minimumStationsNumber, int maximumStationsNumber, int simulationTime) {
         int stationsNumber = minimumStationsNumber;
-        
+
         // max - min --> 54 - 5 pour avoir juste la taile qu'il faut (peut être +1)
         // là pour le coup c'est moi qui me suis trompée dans le DA :(
         int[] totalCosts = new int[maximumStationsNumber];
@@ -176,6 +176,7 @@ public class Main {
 
 
 
+            // passe la en argument des 2 fonctions init comme ça tu ne dois pas en créer 2 autres (pour ne pas repartir au X0)
             GenerationSuite suite = new GenerationSuite(); //TODO: Rajouter x0, c, a, m
 
             int time = 1;
