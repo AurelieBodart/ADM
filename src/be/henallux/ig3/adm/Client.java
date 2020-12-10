@@ -41,7 +41,7 @@ public class Client {
         this.ejected = ejected;
     }
 
-    public boolean getIsEjected() {
+    public boolean isEjected() {
         return ejected;
     }
 }

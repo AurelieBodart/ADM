@@ -223,9 +223,7 @@ public class Main {
                 }
 
                 // Placer les clients express
-
-                // le for doit être sur les stations express, pas sur la file express
-                for (int iExpress = 0; iExpress < expressQueue.length; iExpress++) {
+                for (int iExpress = 0; iExpress < expressStations.length; iExpress++) {
                     int expressQueueLength = 0;
 
                     while (expressQueue[expressQueueLength] != null)
@@ -236,8 +234,7 @@ public class Main {
                         cumulatedExpressQueueDuration += time - expressQueue[0].getSystemEntry();
                         cumulatedExpressStationDuration++;
 
-                        // il faut le placer en station express, pas ailleurs dans la file express
-                        expressQueue[iExpress] = expressQueue[0];
+                        expressStations[iExpress] = expressQueue[0];
 
                         // Retrait de la liste et shifting vers la gauche THE JAVA WAY
                         expressQueue[0] = null;
@@ -249,27 +246,14 @@ public class Main {
                 }
 
                 // Placer les clients ordinaires nuls
-
-                // tu boucles sur les stations express et pas ordinaires
-                for (int iOrdinary = 0; iOrdinary < expressStations.length; iOrdinary++) {
+                for (int iOrdinary = 0; iOrdinary < ordinaryStations.length; iOrdinary++) {
                     if (ordinaryStations[iOrdinary] == null || ordinaryStations[iOrdinary].getServiceDuration() == 0) {
                         if (ordinaryQueue.get(0) != null) {
-
-                            // je ne suis plus sûre que ce if est nécessaire
-                            // si on ajoute juste un client avec le return du remove, ça va écrasser celui qui y est déjà non ?
-                            // donc pas besoin de mettre null
-                            if (ordinaryStations[iOrdinary] != null) {
-                                ordinaryStations[iOrdinary] = null;
-                            }
-
                             ordinaryStations[iOrdinary] = ordinaryQueue.remove(0);
-                            // getIsEjected ?! isEjected non ?
-                            if (!ordinaryStations[iOrdinary].getIsEjected())
+                            if (!ordinaryStations[iOrdinary].isEjected())
                                 cumulatedOrdinaryStationDuration += ordinaryStations[iOrdinary].getServiceDuration();
 
-                            //cumulatedOrdinaryQueueDuration
-                            // et c'est time - getSystemEntry()
-                            cumulatedOrdinaryStationDuration += ordinaryStations[iOrdinary].getSystemEntry();
+                            cumulatedOrdinaryQueueDuration += time - ordinaryStations[iOrdinary].getSystemEntry();
                             ordinaryStations[iOrdinary].decrementServiceDuration();
                         }
                     } else
