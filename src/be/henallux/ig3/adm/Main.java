@@ -232,7 +232,7 @@ public class Main {
                         expressQueueLength++;
 
 
-                    if (expressQueueLength > 0) { //  if (expressQueue.get(0) != null) pour retirer la boucle de recherche
+                    if (expressQueueLength > 0) {
                         cumulatedExpressQueueDuration += time - expressQueue[0].getSystemEntry();
                         cumulatedExpressStationDuration++;
 
