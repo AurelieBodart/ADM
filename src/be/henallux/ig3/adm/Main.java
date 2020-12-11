@@ -143,16 +143,27 @@ public class Main {
 
     public static int simulation(int minimumStationsNumber, int maximumStationsNumber, int simulationTime) {
         int stationsNumber = minimumStationsNumber;
+
+        // max - min --> 54 - 5 pour avoir juste la taile qu'il faut (peut être +1)
+        // là pour le coup c'est moi qui me suis trompée dans le DA :(
         int[] totalCosts = new int[maximumStationsNumber];
+
+        //Ajout de Max
+        // int changingQueueCost = 15; // il est déjà au dessus dans les constantes // AH
+
 
         while (stationsNumber <= maximumStationsNumber) {
             Client[] expressStations = new Client[2];
             Client[] ordinaryStations = new Client[stationsNumber - 2];
 
+
             Client[] expressQueue = new Client[10];
             ArrayList<Client> ordinaryQueue = new ArrayList<>();
             ArrayList<Client> vipQueue = new ArrayList<>();
 
+            // il manque les duréeFileCumulée express, ordinaire et VIP // Il sont juste en dessous non ?
+
+            // => ici
             int cumulatedExpressStationDuration = 0;
             int cumulatedOrdinaryStationDuration = 0;
             int cumulatedVIPStationDuration = 0;
@@ -161,14 +172,48 @@ public class Main {
             int totalClientEjectionCost = 0;
             int totalChangingQueueCost = 0;
 
-            int time = 1;
+            //Ajout de Max
+            int iQueueExpress = 0;
 
+
+
+            // passe la en argument des 2 fonctions init comme ça tu ne dois pas en créer 2 autres (pour ne pas repartir au X0) // FAIT
+            GenerationSuite suite = new GenerationSuite(); //TODO: Rajouter x0, c, a, m
+
+            int time = 1;
             while (time <= simulationTime) {
                 // Placement en file
-                int arrivalsNumber = generateArrivals();
-                ArrayList<Client> clients = initializeClientDurations(arrivalsNumber);
+                int arrivalsNumber = generateArrivals(suite);
+                ArrayList<Client> clients = initializeClientDurations(suite,arrivalsNumber);
 
-                // Partie de Maxime
+
+                // Partie de Maxime //TODO: A vérifier
+                for (Client client : clients) {
+                    client.setSystemEntry(time);
+
+                    if (client.getServiceDuration() == 1) {
+                        if (iQueueExpress < 10) {
+                            client.setType("express");
+                            expressQueue[iQueueExpress] = client;
+                            iQueueExpress++;
+                        } else {
+                            client.setType("ordinaire");
+                            totalChangingQueueCost += QUEUE_CHANGING_COST;
+                            ordinaryQueue.add(client);
+                        }
+                    } else {
+                        double un = suite.generateUn(suite.generateXn());
+
+                        if (un < 0.10) {
+                            client.setType("prioritaire abslolu"); // absolu ;) // FAIT
+                            vipQueue.add(client);
+                        } else {
+                            client.setType("ordinaire");
+                            ordinaryQueue.add(client);
+                        }
+                    }
+                }
+
 
                 // Placement en station + décrémentation
                 // Partie de Christophe
@@ -180,11 +225,38 @@ public class Main {
         return totalCosts[0];
     }
 
-    private int generateArrivals() {
-        // Maxime
+    private static int generateArrivals(GenerationSuite suite) {
+        // tu as déjà créé ta suite avec la boucle sur le temps
+        // passe la en argument ici au lieu d'en créer une autre // FAIT
+        double un = suite.generateUn(suite.generateXn());
+
+        // je chipote pour ça mais j'aurais préféré des if else pour plus de lisibilité mais on peut laiser comme ça
+        // (c'était pour faire plaiz à Christophe ahah Mais j'aime bien comme ça mois :D)
+        int x = (un < 0.1353) ? 0 : (un < 0.4060) ? 1 : (un < 0.6767) ? 2 : (un < 0.8571) ? 3 :
+                (un < 0.9473) ? 4 : (un < 0.9834) ? 5 : (un < 0.9955) ? 6 : (un < 0.9989) ? 7 : (un < 0.9998) ? 8 : 9;
+
+        return x;
     }
 
-    private ArrayList<Client> initializeClientDurations(int arrivalsNumber) {
-        // Maxime
+    private static ArrayList<Client> initializeClientDurations(GenerationSuite suite, int arrivalsNumber) {
+
+        // idem que pour l'autre fonction, tu peux passer la suite en argument de cette fonction  // FAIT
+
+        ArrayList<Client> clients = new ArrayList<>();
+        int iArrival = 0;
+
+        while (iArrival < arrivalsNumber) {
+
+            double un = suite.generateUn(suite.generateXn());
+
+            int x = (un < 0.4) ? 1 : (un < 0.7) ? 2 : (un < 0.8667) ? 3 : (un < 0.9167) ? 4 : (un < 0.9667) ? 5 : 6;
+
+            // ici on peut mettre null pour le type et systemEntry vu qu'on les set plus tard. Ok pour x et false // OK
+            clients.add(new Client(null, x,0,false));
+
+            iArrival++;
+        }
+
+        return clients;
     }
 }
