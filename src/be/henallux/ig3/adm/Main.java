@@ -142,15 +142,13 @@ public class Main {
         return new JumpsTest(h0, h1, alpha, valueNbr);
     }
 
-    public static double simulation(int minimumStationsNumber, int maximumStationsNumber, int simulationTime) {
+    public static CostPerStationsNumber simulation(int minimumStationsNumber, int maximumStationsNumber, int simulationTime) {
         int stationsNumber = minimumStationsNumber;
-        CostPerStationsNumber[] totalCosts = new CostPerStationsNumber[maximumStationsNumber];
+        CostPerStationsNumber[] totalCosts = new CostPerStationsNumber[maximumStationsNumber - minimumStationsNumber + 1];
 
         while (stationsNumber <= maximumStationsNumber) {
-            System.out.println("Nombre de stations : " + stationsNumber);
             Client[] expressStations = new Client[2];
             Client[] ordinaryStations = new Client[stationsNumber - 2];
-
 
             Client[] expressQueue = new Client[10];
             ArrayList<Client> ordinaryQueue = new ArrayList<>();
@@ -168,25 +166,30 @@ public class Main {
             int totalClientEjectionCost = 0;
             int totalChangingQueueCost = 0;
 
-            //Ajout de Max
             int iQueueExpress = 0;
 
-            // passe la en argument des 2 fonctions init comme ça tu ne dois pas en créer 2 autres (pour ne pas repartir au X0) // FAIT
             GenerationSuite suite = new GenerationSuite(4, 28411, 8121, 134456); //TODO: Rajouter x0, c, a, m
 
             for (int time = 1; time <= simulationTime; time++) {
-                System.out.println("\n----------------------------------------------------------");
-                System.out.println("Temps passé : " + time + " minutes");
-                System.out.println("----------------------------------------------------------");
+                if (stationsNumber == minimumStationsNumber && time <= 20) {
+                    System.out.println("\n----------------------------------------------------------");
+                    System.out.println("Temps passé : " + time + " minutes");
+                    System.out.println("----------------------------------------------------------");
 
-                // Placement en file
+                    System.out.println("File ordinaire avant placement en file : " + ordinaryQueue);
+                    System.out.println("File express avant placement en file : " + Arrays.toString(expressQueue));
+                    System.out.println("File prioritaire avant placement en file : " + vipQueue);
+                }
+
                 int arrivalsNumber = generateArrivals(suite);
                 ArrayList<Client> clients = initializeClientDurations(suite,arrivalsNumber);
 
-                System.out.println("Placement en file");
-                System.out.println("----------------------------------------------------------");
-                System.out.println("Clients avant placement en file : " + clients);
-                // Partie de Maxime //TODO: A vérifier
+                if (stationsNumber == minimumStationsNumber && time <= 20) {
+                    System.out.println("Placement en file");
+                    System.out.println("----------------------------------------------------------");
+                    System.out.println("Clients avant placement en file : " + clients);
+                }
+
                 for (Client client : clients) {
                     client.setSystemEntry(time);
 
@@ -204,7 +207,7 @@ public class Main {
                         double un = suite.generateUn(suite.generateXn());
 
                         if (un < 0.10) {
-                            client.setType("prioritaire absolu"); // absolu ;) // FAIT
+                            client.setType("prioritaire absolu");
                             vipQueue.add(client);
                         } else {
                             client.setType("ordinaire");
@@ -213,28 +216,30 @@ public class Main {
                     }
                 }
 
-                System.out.println("\nFile ordinaire : " + ordinaryQueue);
-                System.out.println("File express : " + Arrays.toString(expressQueue));
-                System.out.println("File prioritaire : " + vipQueue);
+                if (stationsNumber == minimumStationsNumber && time <= 20) {
+                    System.out.println("\nFile ordinaire après placement en file : " + ordinaryQueue);
+                    System.out.println("File express après placement en file : " + Arrays.toString(expressQueue));
+                    System.out.println("File prioritaire après placement en file : " + vipQueue);
+                }
 
-                // Placement en station + décrémentation
-                // Partie de Christophe
-                int iVIP = 0;
                 boolean canAddVIP = true;
-                System.out.println("\nStations ordinaires avant placement : " + Arrays.toString(ordinaryStations));
-                System.out.println("Stations express avant placement : " + Arrays.toString(expressStations));
-                System.out.println("Placement en station des VIP");
-                while (!vipQueue.isEmpty() && canAddVIP) {
+                if (stationsNumber == minimumStationsNumber && time <= 20) {
+                    System.out.println("\nStations ordinaires avant placement : " + Arrays.toString(ordinaryStations));
+                    System.out.println("Stations express avant placement : " + Arrays.toString(expressStations));
+                    System.out.println("\nPlacement en station des VIP");
+                    System.out.println("----------------------------------------------------------");
+                }
+                for (int iVIP = 0; iVIP < vipQueue.size() && canAddVIP; iVIP++) {
                     int iFreeStation = -1;
                     int dsMax = 0;
                     int iDsMax = -1;
 
                     for (int iOrdinaryStation = 0; iOrdinaryStation < ordinaryStations.length; iOrdinaryStation++) {
-                        if (ordinaryStations[iOrdinaryStation] == null)
+                        if (ordinaryStations[iOrdinaryStation] == null || ordinaryStations[iOrdinaryStation].getServiceDuration() == 0)
                             iFreeStation = iOrdinaryStation;
                         else {
                             if (iFreeStation == -1
-                                    && ordinaryStations[iOrdinaryStation].getType().equals("Ordinary")
+                                    && ordinaryStations[iOrdinaryStation].getType().equals("ordinaire")
                                     && ordinaryStations[iOrdinaryStation].getServiceDuration() > dsMax) {
                                 dsMax = ordinaryStations[iOrdinaryStation].getServiceDuration();
                                 iDsMax = iOrdinaryStation;
@@ -265,13 +270,13 @@ public class Main {
                         } else
                             canAddVIP = false;
                     }
-                    iVIP++;
                 }
-                System.out.println("\nStations ordinaires après placement des VIP : " + Arrays.toString(ordinaryStations));
+                if (stationsNumber == minimumStationsNumber && time <= 20) {
+                    System.out.println("\nStations ordinaires après placement des VIP : " + Arrays.toString(ordinaryStations));
+                    System.out.println("\nPlacement en station des clients express");
+                    System.out.println("----------------------------------------------------------");
+                }
 
-                System.out.println("\nPlacement en station des clients express");
-                System.out.println("----------------------------------------------------------");
-                // Placer les clients express
                 for (int iExpress = 0; iExpress < expressStations.length; iExpress++) {
                     if (iQueueExpress > 0) {
                         cumulatedExpressQueueDuration += time - expressQueue[0].getSystemEntry();
@@ -279,18 +284,21 @@ public class Main {
 
                         expressStations[iExpress] = expressQueue[0];
 
-                        // Retrait de la liste et shifting vers la gauche THE JAVA WAY
                         System.arraycopy(expressQueue, 1, expressQueue, 0, iQueueExpress);
 
                         iQueueExpress--;
+                    } else {
+                        if (expressStations[iExpress] != null)
+                            expressStations[iExpress] = null;
                     }
                 }
-                System.out.println("Stations express après placement des clients express : " + Arrays.toString(expressStations));
+                if (stationsNumber == minimumStationsNumber && time <= 20) {
+                    System.out.println("Stations express après placement des clients express : " + Arrays.toString(expressStations));
 
-                System.out.println("\nPlacement en station des clients ordinaires");
-                System.out.println("----------------------------------------------------------");
+                    System.out.println("\nPlacement en station des clients ordinaires");
+                    System.out.println("----------------------------------------------------------");
+                }
 
-                // Placer les clients ordinaires nuls
                 for (int iOrdinary = 0; iOrdinary < ordinaryStations.length; iOrdinary++) {
                     if (ordinaryStations[iOrdinary] == null || ordinaryStations[iOrdinary].getServiceDuration() == 0) {
                         if (ordinaryQueue.size() != 0) {
@@ -304,14 +312,15 @@ public class Main {
                     } else
                         ordinaryStations[iOrdinary].decrementServiceDuration();
                 }
-                System.out.println("Stations ordinaires après placement des clients ordinaires : " + Arrays.toString(ordinaryStations));
 
-                System.out.println("\nFile ordinaire après placement en station : " + ordinaryQueue);
-                System.out.println("File express après placement en station : " + Arrays.toString(expressQueue));
-                System.out.println("File prioritaire après placement en station : " + vipQueue);
+                if (stationsNumber == minimumStationsNumber && time <= 20) {
+                    System.out.println("Stations ordinaires après placement des clients ordinaires : " + Arrays.toString(ordinaryStations));
+                    System.out.println("\nFile ordinaire après placement en station : " + ordinaryQueue);
+                    System.out.println("File express après placement en station : " + Arrays.toString(expressQueue));
+                    System.out.println("File prioritaire après placement en station : " + vipQueue);
+                    System.out.print("\n");
+                }
 
-                System.out.println("\n");
-                // Chercher les stations inoccupées
                 for (Client client : expressStations) {
                     if (client == null)
                         vacancyDuration++;
@@ -323,7 +332,6 @@ public class Main {
                 }
             }
 
-            // Calcul des coûts
             totalCosts[stationsNumber - minimumStationsNumber] =
                     new CostPerStationsNumber(
                             (((cumulatedOrdinaryQueueDuration + cumulatedOrdinaryStationDuration) * ORDINARY_CLIENT_COST_PER_MINUTE)
@@ -338,28 +346,27 @@ public class Main {
 
             stationsNumber++;
         }
+
         System.out.println("Coûts totaux : " + Arrays.toString(totalCosts));
 
-        return Collections.min(Arrays.asList(totalCosts)).getCost();
+        return Collections.min(Arrays.asList(totalCosts));
     }
 
     private static int generateArrivals(GenerationSuite suite) {
-        // tu as déjà créé ta suite avec la boucle sur le temps
-        // passe la en argument ici au lieu d'en créer une autre // FAIT
         double un = suite.generateUn(suite.generateXn());
 
-        // je chipote pour ça mais j'aurais préféré des if else pour plus de lisibilité mais on peut laiser comme ça
-        // (c'était pour faire plaiz à Christophe ahah Mais j'aime bien comme ça mois :D)
-        int x = (un < 0.1353) ? 0 : (un < 0.4060) ? 1 : (un < 0.6767) ? 2 : (un < 0.8571) ? 3 :
-                (un < 0.9473) ? 4 : (un < 0.9834) ? 5 : (un < 0.9955) ? 6 : (un < 0.9989) ? 7 : (un < 0.9998) ? 8 : 9;
-
-        return x;
+        return (un < 0.1353) ? 0 :
+                (un < 0.4060) ? 1 :
+                        (un < 0.6767) ? 2 :
+                                (un < 0.8571) ? 3 :
+                                        (un < 0.9473) ? 4 :
+                                                (un < 0.9834) ? 5 :
+                                                        (un < 0.9955) ? 6 :
+                                                                (un < 0.9989) ? 7 :
+                                                                        (un < 0.9998) ? 8 : 9;
     }
 
     private static ArrayList<Client> initializeClientDurations(GenerationSuite suite, int arrivalsNumber) {
-
-        // idem que pour l'autre fonction, tu peux passer la suite en argument de cette fonction  // FAIT
-
         ArrayList<Client> clients = new ArrayList<>();
         int iArrival = 0;
 
@@ -369,7 +376,6 @@ public class Main {
 
             int x = (un < 0.4) ? 1 : (un < 0.7) ? 2 : (un < 0.8667) ? 3 : (un < 0.9167) ? 4 : (un < 0.9667) ? 5 : 6;
 
-            // ici on peut mettre null pour le type et systemEntry vu qu'on les set plus tard. Ok pour x et false // OK
             clients.add(new Client(null, x,0,false));
 
             iArrival++;

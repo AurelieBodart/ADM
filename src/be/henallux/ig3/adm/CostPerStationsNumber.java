@@ -25,9 +25,13 @@ public class CostPerStationsNumber implements Comparable<CostPerStationsNumber> 
         this.stationsNumber = stationsNumber;
     }
 
-
     @Override
     public int compareTo(CostPerStationsNumber o) {
-        return Double.compare(o.getCost(), getCost());
+        return Double.compare(getCost(), o.getCost());
+    }
+
+    @Override
+    public String toString() {
+        return "\n{Station " + stationsNumber + " : " + cost + "€}";
     }
 }
