@@ -43,4 +43,14 @@ public class Client {
     public boolean isEjected() {
         return ejected;
     }
+
+    @Override
+    public String toString() {
+        return "\n\tClient{" +
+                "type='" + type + '\'' +
+                ", serviceDuration=" + serviceDuration +
+                ", systemEntry=" + systemEntry +
+                ", ejected=" + ejected +
+                '}';
+    }
 }

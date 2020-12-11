@@ -25,59 +25,61 @@ public class Main {
             PrintStream out = new PrintStream(redirection);
 
             System.setOut(out);
-
-            ArrayList<Integer> suite = askForSuiteData(keyboard);
-            JumpsTest jumpsTest = askForJumpsTestData(keyboard);
-
-            System.out.println("Suite size : " + suite.size());
-            jumpsTest.countJumps(suite);
-            System.out.println("Sauts size : " + jumpsTest.getJumps().size());
-
-            jumpsTest.generatedTab();
-            for (Jump j : jumpsTest.getJumpsList())
-                System.out.println(" [Saut = " + j.getSaut() +
-                        " ri = " + j.getRi() +
-                        " pi = " + j.getPi() +
-                        " npi = " + j.getNpi());
-
-
-            // Etape 4 : regrouper les npi à partir du bas du tableau si < 5
-            //           calculer khi carré observé
-
-            System.out.println("Etape 4 - npi < 5 ?");
-            jumpsTest.reduceTab();
-            for (Jump j : jumpsTest.getJumpsList())
-                System.out.println(" [Saut = " + j.getSaut() +
-                        " ri = " + j.getRi() +
-                        " pi = " + j.getPi() +
-                        " npi = " + j.getNpi() +
-                        " (ri - npi)^2 / npi = " + j.getPartialX2Observable() + "]");
-
-
-            // Etape 5 : clavier pour khi carré théorique
-
-            System.out.println("Etape 5 - établissement de la zone de non rejet");
-
-            Double chiCarreObservable = jumpsTest.calculChiCarreObservable();
-
-            ChiSquaredDistribution x2 = new ChiSquaredDistribution(jumpsTest.getV());
-            double chiCarreTheorique = x2.inverseCumulativeProbability(jumpsTest.getAlpha());
-
-            System.out.println("Chi carré observable = " + chiCarreObservable);
-            System.out.println("Chi carré théorique = " + chiCarreTheorique);
-
-            // Etape 6 - rejeter h0 ou non en comparant khi carré théorique et observé
-
-            System.out.println("Etape 6 - Rejet ou non de H0");
-            System.out.println("Rappel :" +
-                    "\nH0 = " + jumpsTest.getH0() +
-                    "\nH1 = " + jumpsTest.getH1());
-
-            if (chiCarreObservable > chiCarreTheorique)
-                System.out.println("H0 est rejeté");
-            else
-                System.out.println("H0 est n'est pas rejeté avec un degré d'incertitude de " + jumpsTest.getAlpha());
+//
+//            ArrayList<Integer> suite = askForSuiteData(keyboard);
+//            JumpsTest jumpsTest = askForJumpsTestData(keyboard);
+//
+//            System.out.println("Suite size : " + suite.size());
+//            jumpsTest.countJumps(suite);
+//            System.out.println("Sauts size : " + jumpsTest.getJumps().size());
+//
+//            jumpsTest.generatedTab();
+//            for (Jump j : jumpsTest.getJumpsList())
+//                System.out.println(" [Saut = " + j.getSaut() +
+//                        " ri = " + j.getRi() +
+//                        " pi = " + j.getPi() +
+//                        " npi = " + j.getNpi());
+//
+//
+//            // Etape 4 : regrouper les npi à partir du bas du tableau si < 5
+//            //           calculer khi carré observé
+//
+//            System.out.println("Etape 4 - npi < 5 ?");
+//            jumpsTest.reduceTab();
+//            for (Jump j : jumpsTest.getJumpsList())
+//                System.out.println(" [Saut = " + j.getSaut() +
+//                        " ri = " + j.getRi() +
+//                        " pi = " + j.getPi() +
+//                        " npi = " + j.getNpi() +
+//                        " (ri - npi)^2 / npi = " + j.getPartialX2Observable() + "]");
+//
+//
+//            // Etape 5 : clavier pour khi carré théorique
+//
+//            System.out.println("Etape 5 - établissement de la zone de non rejet");
+//
+//            Double chiCarreObservable = jumpsTest.calculChiCarreObservable();
+//
+//            ChiSquaredDistribution x2 = new ChiSquaredDistribution(jumpsTest.getV());
+//            double chiCarreTheorique = x2.inverseCumulativeProbability(jumpsTest.getAlpha());
+//
+//            System.out.println("Chi carré observable = " + chiCarreObservable);
+//            System.out.println("Chi carré théorique = " + chiCarreTheorique);
+//
+//            // Etape 6 - rejeter h0 ou non en comparant khi carré théorique et observé
+//
+//            System.out.println("Etape 6 - Rejet ou non de H0");
+//            System.out.println("Rappel :" +
+//                    "\nH0 = " + jumpsTest.getH0() +
+//                    "\nH1 = " + jumpsTest.getH1());
+//
+//            if (chiCarreObservable > chiCarreTheorique)
+//                System.out.println("H0 est rejeté");
+//            else
+//                System.out.println("H0 est n'est pas rejeté avec un degré d'incertitude de " + jumpsTest.getAlpha());
+            System.out.println(simulation(4, 54, 600));
         } catch (FileNotFoundException ignored) {}
+
     }
 
     public static ArrayList<Integer> askForSuiteData(Scanner keyboard) {
@@ -144,11 +146,8 @@ public class Main {
         int stationsNumber = minimumStationsNumber;
         CostPerStationsNumber[] totalCosts = new CostPerStationsNumber[maximumStationsNumber];
 
-        //Ajout de Max
-        // int changingQueueCost = 15; // il est déjà au dessus dans les constantes // AH
-
-
         while (stationsNumber <= maximumStationsNumber) {
+            System.out.println("Nombre de stations : " + stationsNumber);
             Client[] expressStations = new Client[2];
             Client[] ordinaryStations = new Client[stationsNumber - 2];
 
@@ -173,14 +172,20 @@ public class Main {
             int iQueueExpress = 0;
 
             // passe la en argument des 2 fonctions init comme ça tu ne dois pas en créer 2 autres (pour ne pas repartir au X0) // FAIT
-            GenerationSuite suite = new GenerationSuite(); //TODO: Rajouter x0, c, a, m
+            GenerationSuite suite = new GenerationSuite(4, 28411, 8121, 134456); //TODO: Rajouter x0, c, a, m
 
             for (int time = 1; time <= simulationTime; time++) {
+                System.out.println("\n----------------------------------------------------------");
+                System.out.println("Temps passé : " + time + " minutes");
+                System.out.println("----------------------------------------------------------");
+
                 // Placement en file
                 int arrivalsNumber = generateArrivals(suite);
                 ArrayList<Client> clients = initializeClientDurations(suite,arrivalsNumber);
 
-
+                System.out.println("Placement en file");
+                System.out.println("----------------------------------------------------------");
+                System.out.println("Clients avant placement en file : " + clients);
                 // Partie de Maxime //TODO: A vérifier
                 for (Client client : clients) {
                     client.setSystemEntry(time);
@@ -199,7 +204,7 @@ public class Main {
                         double un = suite.generateUn(suite.generateXn());
 
                         if (un < 0.10) {
-                            client.setType("prioritaire abslolu"); // absolu ;) // FAIT
+                            client.setType("prioritaire absolu"); // absolu ;) // FAIT
                             vipQueue.add(client);
                         } else {
                             client.setType("ordinaire");
@@ -208,11 +213,17 @@ public class Main {
                     }
                 }
 
+                System.out.println("\nFile ordinaire : " + ordinaryQueue);
+                System.out.println("File express : " + Arrays.toString(expressQueue));
+                System.out.println("File prioritaire : " + vipQueue);
+
                 // Placement en station + décrémentation
                 // Partie de Christophe
                 int iVIP = 0;
                 boolean canAddVIP = true;
-                
+                System.out.println("\nStations ordinaires avant placement : " + Arrays.toString(ordinaryStations));
+                System.out.println("Stations express avant placement : " + Arrays.toString(expressStations));
+                System.out.println("Placement en station des VIP");
                 while (!vipQueue.isEmpty() && canAddVIP) {
                     int iFreeStation = -1;
                     int dsMax = 0;
@@ -256,34 +267,33 @@ public class Main {
                     }
                     iVIP++;
                 }
+                System.out.println("\nStations ordinaires après placement des VIP : " + Arrays.toString(ordinaryStations));
 
+                System.out.println("\nPlacement en station des clients express");
+                System.out.println("----------------------------------------------------------");
                 // Placer les clients express
                 for (int iExpress = 0; iExpress < expressStations.length; iExpress++) {
-                    int expressQueueLength = 0;
-
-                    while (expressQueue[expressQueueLength] != null)
-                        expressQueueLength++;
-
-                    if (expressQueueLength > 0) {
+                    if (iQueueExpress > 0) {
                         cumulatedExpressQueueDuration += time - expressQueue[0].getSystemEntry();
                         cumulatedExpressStationDuration++;
 
                         expressStations[iExpress] = expressQueue[0];
 
                         // Retrait de la liste et shifting vers la gauche THE JAVA WAY
-                        expressQueue[0] = null;
+                        System.arraycopy(expressQueue, 1, expressQueue, 0, iQueueExpress);
 
-                        List<Client> expressQueueAsList = Arrays.asList(expressQueue);
-                        Collections.rotate(expressQueueAsList, 1);
-                        expressQueue = (Client[]) expressQueueAsList.toArray();
                         iQueueExpress--;
                     }
                 }
+                System.out.println("Stations express après placement des clients express : " + Arrays.toString(expressStations));
+
+                System.out.println("\nPlacement en station des clients ordinaires");
+                System.out.println("----------------------------------------------------------");
 
                 // Placer les clients ordinaires nuls
                 for (int iOrdinary = 0; iOrdinary < ordinaryStations.length; iOrdinary++) {
                     if (ordinaryStations[iOrdinary] == null || ordinaryStations[iOrdinary].getServiceDuration() == 0) {
-                        if (ordinaryQueue.get(0) != null) {
+                        if (ordinaryQueue.size() != 0) {
                             ordinaryStations[iOrdinary] = ordinaryQueue.remove(0);
                             if (!ordinaryStations[iOrdinary].isEjected())
                                 cumulatedOrdinaryStationDuration += ordinaryStations[iOrdinary].getServiceDuration();
@@ -294,7 +304,13 @@ public class Main {
                     } else
                         ordinaryStations[iOrdinary].decrementServiceDuration();
                 }
+                System.out.println("Stations ordinaires après placement des clients ordinaires : " + Arrays.toString(ordinaryStations));
 
+                System.out.println("\nFile ordinaire après placement en station : " + ordinaryQueue);
+                System.out.println("File express après placement en station : " + Arrays.toString(expressQueue));
+                System.out.println("File prioritaire après placement en station : " + vipQueue);
+
+                System.out.println("\n");
                 // Chercher les stations inoccupées
                 for (Client client : expressStations) {
                     if (client == null)
@@ -322,6 +338,7 @@ public class Main {
 
             stationsNumber++;
         }
+        System.out.println("Coûts totaux : " + Arrays.toString(totalCosts));
 
         return Collections.min(Arrays.asList(totalCosts)).getCost();
     }
