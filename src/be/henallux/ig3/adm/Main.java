@@ -5,16 +5,15 @@ import org.apache.commons.math3.distribution.ChiSquaredDistribution;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
-    public static final int EXPRESS_CLIENT_COST = 35;
-    public static final int ORDINARY_CLIENT_COST = 25;
-    public static final int ABSOLUTE_CLIENT_COST = 45;
-    public static final int EXPRESS_STATION_OCCUPATION_COST = 32;
-    public static final int ORDINARY_STATION_OCCUPATION_COST = 30;
-    public static final int EMPTY_STATION_COST = 18;
+    public static final double EXPRESS_CLIENT_COST_PER_MINUTE = 35 / 60.;
+    public static final double ORDINARY_CLIENT_COST_PER_MINUTE = 25 / 60.;
+    public static final double ABSOLUTE_CLIENT_COST_PER_MINUTE = 45 / 60.;
+    public static final double EXPRESS_STATION_OCCUPATION_COST_PER_MINUTE = 32 / 60.;
+    public static final double ORDINARY_STATION_OCCUPATION_COST_PER_MINUTE = 30 / 60.;
+    public static final double VACANT_STATION_COST_PER_MINUTE = 18 / 60.;
     public static final int QUEUE_CHANGING_COST = 15;
     public static final int CLIENT_EJECTION_COST = 20;
 
@@ -141,12 +140,9 @@ public class Main {
         return new JumpsTest(h0, h1, alpha, valueNbr);
     }
 
-    public static int simulation(int minimumStationsNumber, int maximumStationsNumber, int simulationTime) {
+    public static double simulation(int minimumStationsNumber, int maximumStationsNumber, int simulationTime) {
         int stationsNumber = minimumStationsNumber;
-
-        // max - min --> 54 - 5 pour avoir juste la taile qu'il faut (peut être +1)
-        // là pour le coup c'est moi qui me suis trompée dans le DA :(
-        int[] totalCosts = new int[maximumStationsNumber];
+        CostPerStationsNumber[] totalCosts = new CostPerStationsNumber[maximumStationsNumber];
 
         //Ajout de Max
         // int changingQueueCost = 15; // il est déjà au dessus dans les constantes // AH
@@ -161,9 +157,10 @@ public class Main {
             ArrayList<Client> ordinaryQueue = new ArrayList<>();
             ArrayList<Client> vipQueue = new ArrayList<>();
 
-            // il manque les duréeFileCumulée express, ordinaire et VIP // Il sont juste en dessous non ?
+            int cumulatedExpressQueueDuration = 0;
+            int cumulatedOrdinaryQueueDuration = 0;
+            int cumulatedVIPQueueDuration = 0;
 
-            // => ici
             int cumulatedExpressStationDuration = 0;
             int cumulatedOrdinaryStationDuration = 0;
             int cumulatedVIPStationDuration = 0;
@@ -175,13 +172,10 @@ public class Main {
             //Ajout de Max
             int iQueueExpress = 0;
 
-
-
             // passe la en argument des 2 fonctions init comme ça tu ne dois pas en créer 2 autres (pour ne pas repartir au X0) // FAIT
             GenerationSuite suite = new GenerationSuite(); //TODO: Rajouter x0, c, a, m
 
-            int time = 1;
-            while (time <= simulationTime) {
+            for (int time = 1; time <= simulationTime; time++) {
                 // Placement en file
                 int arrivalsNumber = generateArrivals(suite);
                 ArrayList<Client> clients = initializeClientDurations(suite,arrivalsNumber);
@@ -214,15 +208,122 @@ public class Main {
                     }
                 }
 
-
                 // Placement en station + décrémentation
                 // Partie de Christophe
+                int iVIP = 0;
+                boolean canAddVIP = true;
+                
+                while (!vipQueue.isEmpty() && canAddVIP) {
+                    int iFreeStation = -1;
+                    int dsMax = 0;
+                    int iDsMax = -1;
+
+                    for (int iOrdinaryStation = 0; iOrdinaryStation < ordinaryStations.length; iOrdinaryStation++) {
+                        if (ordinaryStations[iOrdinaryStation] == null)
+                            iFreeStation = iOrdinaryStation;
+                        else {
+                            if (iFreeStation == -1
+                                    && ordinaryStations[iOrdinaryStation].getType().equals("Ordinary")
+                                    && ordinaryStations[iOrdinaryStation].getServiceDuration() > dsMax) {
+                                dsMax = ordinaryStations[iOrdinaryStation].getServiceDuration();
+                                iDsMax = iOrdinaryStation;
+                            }
+                        }
+                    }
+
+                    if (iFreeStation != -1) {
+                        cumulatedVIPQueueDuration += time - vipQueue.get(iVIP).getSystemEntry();
+                        cumulatedVIPStationDuration += vipQueue.get(iVIP).getServiceDuration();
+
+                        ordinaryStations[iFreeStation] = vipQueue.remove(iVIP);
+                        ordinaryStations[iFreeStation].decrementServiceDuration();
+                    } else {
+                        if (iDsMax != -1) {
+                            totalClientEjectionCost += CLIENT_EJECTION_COST;
+
+                            ordinaryStations[iDsMax].setSystemEntry(time);
+                            ordinaryStations[iDsMax].setIsEjected(true);
+
+                            ordinaryQueue.add(0, ordinaryStations[iDsMax]);
+
+                            cumulatedVIPQueueDuration += time - vipQueue.get(iVIP).getSystemEntry();
+                            cumulatedVIPStationDuration += vipQueue.get(iVIP).getServiceDuration();
+
+                            ordinaryStations[iDsMax] = vipQueue.remove(iVIP);
+                            ordinaryStations[iDsMax].decrementServiceDuration();
+                        } else
+                            canAddVIP = false;
+                    }
+                    iVIP++;
+                }
+
+                // Placer les clients express
+                for (int iExpress = 0; iExpress < expressStations.length; iExpress++) {
+                    int expressQueueLength = 0;
+
+                    while (expressQueue[expressQueueLength] != null)
+                        expressQueueLength++;
+
+                    if (expressQueueLength > 0) {
+                        cumulatedExpressQueueDuration += time - expressQueue[0].getSystemEntry();
+                        cumulatedExpressStationDuration++;
+
+                        expressStations[iExpress] = expressQueue[0];
+
+                        // Retrait de la liste et shifting vers la gauche THE JAVA WAY
+                        expressQueue[0] = null;
+
+                        List<Client> expressQueueAsList = Arrays.asList(expressQueue);
+                        Collections.rotate(expressQueueAsList, 1);
+                        expressQueue = (Client[]) expressQueueAsList.toArray();
+                        iQueueExpress--;
+                    }
+                }
+
+                // Placer les clients ordinaires nuls
+                for (int iOrdinary = 0; iOrdinary < ordinaryStations.length; iOrdinary++) {
+                    if (ordinaryStations[iOrdinary] == null || ordinaryStations[iOrdinary].getServiceDuration() == 0) {
+                        if (ordinaryQueue.get(0) != null) {
+                            ordinaryStations[iOrdinary] = ordinaryQueue.remove(0);
+                            if (!ordinaryStations[iOrdinary].isEjected())
+                                cumulatedOrdinaryStationDuration += ordinaryStations[iOrdinary].getServiceDuration();
+
+                            cumulatedOrdinaryQueueDuration += time - ordinaryStations[iOrdinary].getSystemEntry();
+                            ordinaryStations[iOrdinary].decrementServiceDuration();
+                        }
+                    } else
+                        ordinaryStations[iOrdinary].decrementServiceDuration();
+                }
+
+                // Chercher les stations inoccupées
+                for (Client client : expressStations) {
+                    if (client == null)
+                        vacancyDuration++;
+                }
+
+                for (Client client: ordinaryStations) {
+                    if (client == null)
+                        vacancyDuration++;
+                }
             }
+
+            // Calcul des coûts
+            totalCosts[stationsNumber - minimumStationsNumber] =
+                    new CostPerStationsNumber(
+                            (((cumulatedOrdinaryQueueDuration + cumulatedOrdinaryStationDuration) * ORDINARY_CLIENT_COST_PER_MINUTE)
+                                    + ((cumulatedExpressQueueDuration + cumulatedExpressQueueDuration) * EXPRESS_CLIENT_COST_PER_MINUTE)
+                                    + ((cumulatedVIPQueueDuration + cumulatedVIPStationDuration) * ABSOLUTE_CLIENT_COST_PER_MINUTE)
+                                    + (cumulatedExpressStationDuration * EXPRESS_STATION_OCCUPATION_COST_PER_MINUTE)
+                                    + ((cumulatedOrdinaryStationDuration + cumulatedVIPStationDuration) * ORDINARY_STATION_OCCUPATION_COST_PER_MINUTE)
+                                    + (vacancyDuration * VACANT_STATION_COST_PER_MINUTE)
+                                    + totalChangingQueueCost
+                                    + totalClientEjectionCost),
+                            stationsNumber);
 
             stationsNumber++;
         }
 
-        return totalCosts[0];
+        return Collections.min(Arrays.asList(totalCosts)).getCost();
     }
 
     private static int generateArrivals(GenerationSuite suite) {
