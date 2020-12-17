@@ -1,7 +1,6 @@
 package be.henallux.ig3.adm;
 
 import org.apache.commons.math3.distribution.ChiSquaredDistribution;
-
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -26,60 +25,60 @@ public class Main {
 
             System.setOut(out);
 
-            ArrayList<Integer> suite = askForSuiteData(keyboard);
-            JumpsTest jumpsTest = askForJumpsTestData(keyboard);
+//            ArrayList<Integer> suite = askForSuiteData(keyboard);
+//            JumpsTest jumpsTest = askForJumpsTestData(keyboard);
+//
+//            System.out.println("Suite size : " + suite.size());
+//            jumpsTest.countJumps(suite);
+//            System.out.println("Sauts size : " + jumpsTest.getJumps().size());
+//
+//            jumpsTest.generatedTab();
+//            for (Jump j : jumpsTest.getJumpsList())
+//                System.out.println(" [Saut = " + j.getSaut() +
+//                        "\tri = " + j.getRi() +
+//                        "\tpi = " + j.getPi() +
+//                        "\tnpi = " + j.getNpi()+ "]");
+//
+//
+//            // Etape 4 : regrouper les npi à partir du bas du tableau si < 5
+//            //           calculer khi carré observé
+//
+//            System.out.println("Etape 4 - npi < 5 ?");
+//            jumpsTest.reduceTab();
+//            for (Jump j : jumpsTest.getJumpsList())
+//                System.out.println(" [Saut = " + j.getSaut() +
+//                        "\tri = " + j.getRi() +
+//                        "\tpi = " + j.getPi() +
+//                        "\tnpi = " + j.getNpi() +
+//                        "\t(ri - npi)^2 / npi = " + j.getPartialX2Observable() + "]");
+//
+//
+//            // Etape 5 : clavier pour khi carré théorique
+//
+//            System.out.println("Etape 5 - établissement de la zone de non rejet");
+//
+//            Double chiCarreObservable = jumpsTest.calculChiCarreObservable();
+//
+//            ChiSquaredDistribution x2 = new ChiSquaredDistribution(jumpsTest.getV());
+//            double chiCarreTheorique = x2.inverseCumulativeProbability(jumpsTest.getAlpha());
+//
+//            System.out.println("Chi carré observable = " + chiCarreObservable);
+//            System.out.println("Chi carré théorique = " + chiCarreTheorique);
+//
+//            // Etape 6 - rejeter h0 ou non en comparant khi carré théorique et observé
+//
+//            System.out.println("Etape 6 - Rejet ou non de H0");
+//            System.out.println("Rappel :" +
+//                    "\nH0 = " + jumpsTest.getH0() +
+//                    "\nH1 = " + jumpsTest.getH1());
+//
+//            if (chiCarreObservable > chiCarreTheorique)
+//                System.out.println("H0 est rejeté");
+//            else
+//                System.out.println("H0 est n'est pas rejeté avec un degré d'incertitude de " + jumpsTest.getAlpha());
+//
 
-            System.out.println("Suite size : " + suite.size());
-            jumpsTest.countJumps(suite);
-            System.out.println("Sauts size : " + jumpsTest.getJumps().size());
-
-            jumpsTest.generatedTab();
-            for (Jump j : jumpsTest.getJumpsList())
-                System.out.println(" [Saut = " + j.getSaut() +
-                        "\tri = " + j.getRi() +
-                        "\tpi = " + j.getPi() +
-                        "\tnpi = " + j.getNpi()+ "]");
-
-
-            // Etape 4 : regrouper les npi à partir du bas du tableau si < 5
-            //           calculer khi carré observé
-
-            System.out.println("Etape 4 - npi < 5 ?");
-            jumpsTest.reduceTab();
-            for (Jump j : jumpsTest.getJumpsList())
-                System.out.println(" [Saut = " + j.getSaut() +
-                        "\tri = " + j.getRi() +
-                        "\tpi = " + j.getPi() +
-                        "\tnpi = " + j.getNpi() +
-                        "\t(ri - npi)^2 / npi = " + j.getPartialX2Observable() + "]");
-
-
-            // Etape 5 : clavier pour khi carré théorique
-
-            System.out.println("Etape 5 - établissement de la zone de non rejet");
-
-            Double chiCarreObservable = jumpsTest.calculChiCarreObservable();
-
-            ChiSquaredDistribution x2 = new ChiSquaredDistribution(jumpsTest.getV());
-            double chiCarreTheorique = x2.inverseCumulativeProbability(jumpsTest.getAlpha());
-
-            System.out.println("Chi carré observable = " + chiCarreObservable);
-            System.out.println("Chi carré théorique = " + chiCarreTheorique);
-
-            // Etape 6 - rejeter h0 ou non en comparant khi carré théorique et observé
-
-            System.out.println("Etape 6 - Rejet ou non de H0");
-            System.out.println("Rappel :" +
-                    "\nH0 = " + jumpsTest.getH0() +
-                    "\nH1 = " + jumpsTest.getH1());
-
-            if (chiCarreObservable > chiCarreTheorique)
-                System.out.println("H0 est rejeté");
-            else
-                System.out.println("H0 est n'est pas rejeté avec un degré d'incertitude de " + jumpsTest.getAlpha());
-
-
-            //System.out.println(simulation(5, 54, 600));
+            System.out.println(simulation(5, 54, 600));
         } catch (FileNotFoundException ignored) {}
 
     }
@@ -232,7 +231,7 @@ public class Main {
                     System.out.println("\nPlacement en station des VIP");
                     System.out.println("----------------------------------------------------------");
                 }
-                
+
                 for (int iVIP = 0; iVIP < vipQueue.size() && canAddVIP; iVIP++) {
                     int iFreeStation = -1;
                     int dsMax = 0;
@@ -349,6 +348,17 @@ public class Main {
                                     + totalChangingQueueCost
                                     + totalClientEjectionCost),
                             stationsNumber);
+
+            System.out.println("\n\nNombre de stations : " + stationsNumber);
+            System.out.println("Coût de présence dans le système - client express " + (cumulatedOrdinaryQueueDuration + cumulatedOrdinaryStationDuration) * ORDINARY_CLIENT_COST_PER_MINUTE);
+            System.out.println("Coût de présence dans le système - client ordinaire " + (cumulatedExpressQueueDuration + cumulatedExpressQueueDuration) * EXPRESS_CLIENT_COST_PER_MINUTE);
+            System.out.println("Coût de présence dans le système - client prioritaire absolu " + (cumulatedVIPQueueDuration + cumulatedVIPStationDuration) * ABSOLUTE_CLIENT_COST_PER_MINUTE);
+            System.out.println("Coût pour 1h d'occupation - station express " + (cumulatedExpressStationDuration * EXPRESS_STATION_OCCUPATION_COST_PER_MINUTE));
+            System.out.println("Coût pour 1h d'occupation - station ordinaire " + (cumulatedOrdinaryStationDuration + cumulatedVIPStationDuration) * ORDINARY_STATION_OCCUPATION_COST_PER_MINUTE);
+            System.out.println("Coût pour 1h d'inoccupation " + vacancyDuration * VACANT_STATION_COST_PER_MINUTE);
+            System.out.println("Coût de changement de file " + totalChangingQueueCost);
+            System.out.println("Coût d'éjection d'un client " + totalClientEjectionCost);
+            System.out.println("Coût total " + totalCosts[stationsNumber - minimumStationsNumber]);
 
             stationsNumber++;
         }
