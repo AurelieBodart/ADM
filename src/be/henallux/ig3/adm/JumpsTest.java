@@ -126,7 +126,10 @@ public class JumpsTest {
         for(int i = jumpsList.size()- 1; i > 0; i--){
             if(jumpsList.get(i).getNpi() < 5) {
                 double newNPi = jumpsList.get(i).getNpi() + jumpsList.get(i - 1).getNpi();
+                int newRi = jumpsList.get(i).getRi() + jumpsList.get(i - 1).getRi();
                 jumpsList.get(i - 1).setNpi(newNPi);
+
+                jumpsList.get(i - 1).setRi(newRi);
                 jumpsList.remove(jumpsList.get(i));
             }
         }
@@ -138,7 +141,7 @@ public class JumpsTest {
     }
 
     public Double calculChiCarreObservable() {
-        Double chiCarreObservable = 0.;
+        double chiCarreObservable = 0.;
 
         for(Jump jump : jumpsList)
             chiCarreObservable += jump.getPartialX2Observable();

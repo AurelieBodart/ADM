@@ -25,58 +25,58 @@ public class Main {
 
             System.setOut(out);
 
-//            ArrayList<Integer> suite = askForSuiteData(keyboard);
-//            JumpsTest jumpsTest = askForJumpsTestData(keyboard);
-//
-//            System.out.println("Suite size : " + suite.size());
-//            jumpsTest.countJumps(suite);
-//            System.out.println("Sauts size : " + jumpsTest.getJumps().size());
-//
-//            jumpsTest.generatedTab();
-//            for (Jump j : jumpsTest.getJumpsList())
-//                System.out.println(" [Saut = " + j.getSaut() +
-//                        "\tri = " + j.getRi() +
-//                        "\tpi = " + j.getPi() +
-//                        "\tnpi = " + j.getNpi()+ "]");
-//
-//
-//            // Etape 4 : regrouper les npi à partir du bas du tableau si < 5
-//            //           calculer khi carré observé
-//
-//            System.out.println("Etape 4 - npi < 5 ?");
-//            jumpsTest.reduceTab();
-//            for (Jump j : jumpsTest.getJumpsList())
-//                System.out.println(" [Saut = " + j.getSaut() +
-//                        "\tri = " + j.getRi() +
-//                        "\tpi = " + j.getPi() +
-//                        "\tnpi = " + j.getNpi() +
-//                        "\t(ri - npi)^2 / npi = " + j.getPartialX2Observable() + "]");
-//
-//
-//            // Etape 5 : clavier pour khi carré théorique
-//
-//            System.out.println("Etape 5 - établissement de la zone de non rejet");
-//
-//            Double chiCarreObservable = jumpsTest.calculChiCarreObservable();
-//
-//            ChiSquaredDistribution x2 = new ChiSquaredDistribution(jumpsTest.getV());
-//            double chiCarreTheorique = x2.inverseCumulativeProbability(jumpsTest.getAlpha());
-//
-//            System.out.println("Chi carré observable = " + chiCarreObservable);
-//            System.out.println("Chi carré théorique = " + chiCarreTheorique);
-//
-//            // Etape 6 - rejeter h0 ou non en comparant khi carré théorique et observé
-//
-//            System.out.println("Etape 6 - Rejet ou non de H0");
-//            System.out.println("Rappel :" +
-//                    "\nH0 = " + jumpsTest.getH0() +
-//                    "\nH1 = " + jumpsTest.getH1());
-//
-//            if (chiCarreObservable > chiCarreTheorique)
-//                System.out.println("H0 est rejeté");
-//            else
-//                System.out.println("H0 est n'est pas rejeté avec un degré d'incertitude de " + jumpsTest.getAlpha());
-//
+            ArrayList<Integer> suite = askForSuiteData(keyboard);
+            JumpsTest jumpsTest = askForJumpsTestData(keyboard);
+
+            System.out.println("Suite size : " + suite.size());
+            jumpsTest.countJumps(suite);
+            System.out.println("Sauts size : " + jumpsTest.getJumps().size());
+
+            jumpsTest.generatedTab();
+            for (Jump j : jumpsTest.getJumpsList())
+                System.out.println(" [Saut = " + j.getSaut() +
+                        "\tri = " + j.getRi() +
+                        "\tpi = " + j.getPi() +
+                        "\tnpi = " + j.getNpi()+ "]");
+
+
+            // Etape 4 : regrouper les npi à partir du bas du tableau si < 5
+            //           calculer khi carré observé
+
+            System.out.println("Etape 4 - npi < 5 ?");
+            jumpsTest.reduceTab();
+            for (Jump j : jumpsTest.getJumpsList())
+                System.out.println(" [Saut = " + j.getSaut() +
+                        "\tri = " + j.getRi() +
+                        "\tpi = " + j.getPi() +
+                        "\tnpi = " + j.getNpi() +
+                        "\t(ri - npi)^2 / npi = " + j.getPartialX2Observable() + "]");
+
+
+            // Etape 5 : clavier pour khi carré théorique
+
+            System.out.println("Etape 5 - établissement de la zone de non rejet");
+
+            Double chiCarreObservable = jumpsTest.calculChiCarreObservable();
+
+            ChiSquaredDistribution x2 = new ChiSquaredDistribution(jumpsTest.getV());
+            double chiCarreTheorique = x2.inverseCumulativeProbability(jumpsTest.getAlpha());
+
+            System.out.println("Chi carré observable = " + chiCarreObservable);
+            System.out.println("Chi carré théorique = " + chiCarreTheorique);
+
+            // Etape 6 - rejeter h0 ou non en comparant khi carré théorique et observé
+
+            System.out.println("Etape 6 - Rejet ou non de H0");
+            System.out.println("Rappel :" +
+                    "\nH0 = " + jumpsTest.getH0() +
+                    "\nH1 = " + jumpsTest.getH1());
+            System.out.println(jumpsTest.getV());
+            if (chiCarreObservable > chiCarreTheorique)
+                System.out.println("H0 est rejeté");
+            else
+                System.out.println("H0 est n'est pas rejeté avec un degré d'incertitude de " + jumpsTest.getAlpha());
+
 
             System.out.println(simulation(5, 54, 600));
         } catch (FileNotFoundException ignored) {}
@@ -169,7 +169,7 @@ public class Main {
 
             int iQueueExpress = 0;
 
-            GenerationSuite suite = new GenerationSuite(4, 28411, 8121, 134456); //TODO: Rajouter x0, c, a, m
+            GenerationSuite suite = new GenerationSuite(4, 28411, 8121, 134456);
 
             for (int time = 1; time <= simulationTime; time++) {
                 if (stationsNumber == minimumStationsNumber && time <= 20) {
@@ -207,7 +207,7 @@ public class Main {
                     } else {
                         double un = suite.generateUn(suite.generateXn());
 
-                        if (un < 0.10) {
+                        if (un < 0.1) {
                             client.setType("prioritaire absolu");
                             vipQueue.add(client);
                         } else {
